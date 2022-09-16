@@ -1,33 +1,19 @@
 <template>
-  <div>
-    <button @click="createTask()">Новое задание</button>
-    <table>
-      <thead>
-        <tr>
-          <th>Название</th>
-          <th>Дата</th>
-          <th>Статус</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="task in tasksStore.tasks" :key="task.id">
-          <td>{{ task.name }}</td>
-          <td>{{ task.date }}</td>
-          <td>{{ task.status }}</td>
-          <td>
-            <button @click="updateTask(task)">Редактировать</button>
-            <button @click="deleteTask(task)">Удалить</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  <button class="btn btn-primary" @click="createTask()">
+    <img src="../assets/plus-white-icon.svg" alt="">
+    Новое задание
+  </button>
+  <TasksTable
+    :tasks="tasksStore.tasks"
+    @update:task="updateTask($event)"
+    @delete:task="deleteTask($event)"
+  />
 </template>
 
 <script setup>
   import { useRouter } from 'vue-router';
   import useTasksStore from '../store/tasks';
+  import TasksTable from './TasksTable.vue';
 
   const router = useRouter();
   const tasksStore = useTasksStore();
