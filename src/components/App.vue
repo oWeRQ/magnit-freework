@@ -30,6 +30,10 @@ export default {
     border: none;
   }
 
+  ::placeholder {
+    color: #9FA2A5;
+  }
+
   select,
   textarea,
   input[type=date],
@@ -57,6 +61,7 @@ export default {
   .btn {
     display: inline-flex;
     align-items: center;
+    flex-shrink: 0;
     padding: 13px 14px;
     font: inherit;
     line-height: 1;
