@@ -1,5 +1,5 @@
 <template>
-  <fieldset @change="change()">
+  <fieldset @change="updateTask()">
     <div>
       <label>Название задания:</label>
       <input type="text" v-model="name">
@@ -45,7 +45,7 @@
     status: status.value,
   }));
 
-  function change() {
+  function updateTask() {
     emit('update:task', task.value);
   }
 </script>
