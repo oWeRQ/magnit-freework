@@ -30,6 +30,24 @@ export default {
     border: none;
   }
 
+  select,
+  textarea,
+  input[type=date],
+  input[type=text] {
+    box-sizing: border-box;
+    padding: 13px 16px;
+    width: 100%;
+    font: inherit;
+    background: #FFFFFF;
+    border: 1px solid #DFE3E7;
+    border-radius: 4px;
+  }
+
+  textarea {
+    height: 140px;
+    resize: none;
+  }
+
   button {
     padding: 0;
     background: transparent;
