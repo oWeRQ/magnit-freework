@@ -75,6 +75,7 @@ export default {
   .btn-primary {
     color: #FFFFFF;
     background: #106EDC;
+    border-color: transparent;
   }
   .btn-shadow {
     box-shadow: 0px 2px 14px rgba(204, 214, 221, 0.5);
