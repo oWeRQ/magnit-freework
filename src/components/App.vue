@@ -18,6 +18,18 @@ export default {
     color: #10171E;
   }
 
+  h1 {
+    margin: 0 0 24px;
+    font-size: 22px;
+    font-weight: 500;
+  }
+
+  fieldset {
+    padding: 0;
+    margin: 0;
+    border: none;
+  }
+
   button {
     padding: 0;
     background: transparent;
@@ -25,19 +37,32 @@ export default {
   }
 
   .btn {
+    display: inline-flex;
+    align-items: center;
     padding: 13px 14px;
     font: inherit;
     line-height: 1;
-    border: none;
+    background: white;
+    border: 1px solid #DFE3E7;
     border-radius: 6px;
+  }
+  .btn + .btn {
+    margin-left: 10px;
   }
   .btn-primary {
     color: #FFFFFF;
     background: #106EDC;
   }
+  .btn-shadow {
+    box-shadow: 0px 2px 14px rgba(204, 214, 221, 0.5);
+  }
+  .btn-separator {
+    margin: 0 30px;
+    min-height: 40px;
+    border-left: 1px solid #BBC0C5;
+  }
   .btn img {
-    margin-right: 8px;
-    vertical-align: top;
+    margin-right: 13px;
   }
 
   .container {
