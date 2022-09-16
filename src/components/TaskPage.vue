@@ -112,13 +112,14 @@
 <style scoped>
   .steps {
     display: flex;
-    margin: 24px 30px 30px 0;
+    margin: 24px 97px 30px 0;
     padding: 0;
     list-style: none;
     counter-reset: steps;
   }
   .steps > * {
     flex-grow: 1;
+    flex-basis: 0;
     margin-right: 10px;
     padding: 18px 24px;
     font-size: 18px;
@@ -142,7 +143,7 @@
 
   .actions {
     display: flex;
-    margin: 30px 0;
+    margin: 30px 77px 30px 0;
     padding: 21px 30px;
     background: #F6F6F6;
     border-top: 1px dashed rgb(130, 137, 143, .6);
