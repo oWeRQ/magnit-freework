@@ -7,30 +7,30 @@ export default function useConfirm() {
     show: false,
     title: null,
     body: null,
-    count: null,
+    data: null,
   });
 
   function closeConfirm(result = false) {
     confirm.show = false;
     confirm.title = null;
     confirm.body = null;
-    confirm.count = null;
+    confirm.data = null;
     confirmResolve(result);
   }
 
-  function deleteConfirm(count = 1) {
+  function showConfirm(title, body = null, data = null) {
     return new Promise(resolve => {
       confirmResolve = resolve;
       confirm.show = true;
-      confirm.title = 'Удалить выбранное?',
-      confirm.body = 'Выбранные вами объекты удалятся без возможности восстановления.',
-      confirm.count = count;
+      confirm.title = title,
+      confirm.body = body,
+      confirm.data = data;
     });
   }
 
   return {
     confirm,
     closeConfirm,
-    deleteConfirm,
+    showConfirm,
   };
 }

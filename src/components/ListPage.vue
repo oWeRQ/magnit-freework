@@ -15,7 +15,7 @@
     <template #title>{{ confirm.title }}</template>
     <div>
       {{ confirm.body }}
-      <CountLine :value="confirm.count" />
+      <CountLine :value="confirm.data" />
     </div>
     <template #actions="{ close }">
       <button class="btn" @click="close(false)">Отмена</button>
@@ -33,7 +33,7 @@
   import Modal from './Modal.vue';
   import CountLine from './CountLine.vue';
 
-  const { confirm, closeConfirm, deleteConfirm } = useConfirm();
+  const { confirm, closeConfirm, showConfirm } = useConfirm();
   const router = useRouter();
   const tasksStore = useTasksStore();
   const tasks = ref();
@@ -47,7 +47,7 @@
   }
 
   async function deleteTask(task) {
-    if (await deleteConfirm()) {
+    if (await showConfirm('Удалить выбранное?', 'Выбранные вами объекты удалятся без возможности восстановления.', 1)) {
       await tasksStore.deleteTask(task);
       await fetchTasks();
     }

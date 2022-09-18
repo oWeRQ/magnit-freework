@@ -42,6 +42,17 @@
     />
     <p v-else>Загрузка...</p>
   </div>
+
+  <Modal :show="confirm.show" @close="closeConfirm($event)">
+    <template #title>{{ confirm.title }}</template>
+    <div>
+      {{ confirm.body }}
+    </div>
+    <template #actions="{ close }">
+      <button class="btn" @click="close(false)">Нет</button>
+      <button class="btn btn-primary" @click="close(true)">Да</button>
+    </template>
+  </Modal>
 </template>
 
 <script setup>
@@ -50,9 +61,12 @@
   import useTasksStore from '../store/tasks';
   import useDocumentsStore from '../store/documents';
   import useCommentsStore from '../store/comments';
+
+  import Modal from './Modal.vue';
   import TaskStep from './TaskStep.vue';
   import DocumentsStep from './DocumentsStep.vue';
   import CommentsStep from './CommentsStep.vue';
+  import useConfirm from '../hooks/confirm';
 
   const structuredClone = window.structuredClone;
   const router = useRouter();
@@ -60,6 +74,7 @@
   const tasksStore = useTasksStore();
   const documentsStore = useDocumentsStore();
   const commentsStore = useCommentsStore();
+  const { confirm, closeConfirm, showConfirm } = useConfirm();
 
   const defaultTask = {
     id: null,
@@ -120,10 +135,6 @@
     comments.value = structuredClone(id.value && await commentsStore.getCommentsByTaskId(id.value) || []);
   }
 
-  async function cancelConfirm() {
-    return confirm('Отменить?');
-  }
-
   function canChangeStep(i) {
     if (i < 0 || i >= steps.length)
       return false;
@@ -167,7 +178,7 @@
   }
 
   async function cancelTask() {
-    if (await cancelConfirm()) {
+    if (await showConfirm('Отменить?')) {
       backToList();
     }
   }
