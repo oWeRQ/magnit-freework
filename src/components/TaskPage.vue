@@ -30,7 +30,16 @@
         Отмена
       </button>
     </div>
-    <component v-if="isLoaded" :is="activeStep.component" :task="task" @update:task="updateTask($event)" />
+    <component
+      v-if="!isLoaded"
+      :is="activeStep.component"
+      :task="task"
+      :documents="documents"
+      :comments="comments"
+      @update:task="updateTask($event)"
+      @update:documents="updateDocuments($event)"
+      @update:comments="updateComments($event)"
+    />
     <p v-else>Загрузка...</p>
   </div>
 </template>
@@ -39,6 +48,8 @@
   import { ref, computed, watch, onMounted } from 'vue';
   import { useRouter, useRoute } from 'vue-router';
   import useTasksStore from '../store/tasks';
+  import useDocumentsStore from '../store/documents';
+  import useCommentsStore from '../store/comments';
   import TaskStep from './TaskStep.vue';
   import DocumentsStep from './DocumentsStep.vue';
   import CommentsStep from './CommentsStep.vue';
@@ -47,6 +58,8 @@
   const router = useRouter();
   const route = useRoute();
   const tasksStore = useTasksStore();
+  const documentsStore = useDocumentsStore();
+  const commentsStore = useCommentsStore();
 
   const defaultTask = {
     id: null,
@@ -58,9 +71,11 @@
     comments: [],
   };
   const task = ref();
+  const documents = ref();
+  const comments = ref();
   const id = computed(() => route.params.id);
   const isNew = computed(() => !id.value);
-  const isLoaded = computed(() => !!task.value);
+  const isLoaded = computed(() => !task.value);
 
   const steps = [
     {
@@ -83,14 +98,26 @@
 
   watch(id, () => {
     fetchTask();
+    fetchDocuments();
+    fetchComments();
   });
 
   onMounted(() => {
     fetchTask();
+    fetchDocuments();
+    fetchComments();
   });
 
   async function fetchTask() {
     task.value = structuredClone(id.value && await tasksStore.getTaskById(id.value) || defaultTask);
+  }
+
+  async function fetchDocuments() {
+    documents.value = structuredClone(id.value && await documentsStore.getDocumentsByTaskId(id.value) || []);
+  }
+
+  async function fetchComments() {
+    comments.value = structuredClone(id.value && await commentsStore.getCommentsByTaskId(id.value) || []);
   }
 
   async function cancelConfirm() {
@@ -125,7 +152,18 @@
   }
 
   async function saveTask() {
-    await tasksStore.saveTask(task.value);
+    const taskId = task.value.id;
+
+    await Promise.all([
+      tasksStore.saveTask(task.value),
+      ...documents.value.filter(d => !d.id).map(document => {
+        return documentsStore.saveDocument({ ...document, taskId });
+      }),
+      ...comments.value.filter(c => !c.id).map(comment => {
+        return commentsStore.saveComment({ ...comment, taskId });
+      }),
+    ]);
+
     backToList();
   }
 
@@ -141,10 +179,24 @@
     });
   }
 
-  function updateTask(value) {
+  function updateTask(values) {
     task.value = {
       ...task.value,
-      ...value,
+      ...values,
+    };
+  }
+
+  function updateDocuments(documents) {
+    task.value = {
+      ...task.value,
+      documents,
+    };
+  }
+
+  function updateComments(comments) {
+    task.value = {
+      ...task.value,
+      comments,
     };
   }
 </script>

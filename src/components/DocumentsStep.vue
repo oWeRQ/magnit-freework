@@ -4,44 +4,51 @@
       <FilesField @change="uploadDocuments($event)" />
     </div>
     <div class="list-col">
-      <h2 class="list-title">Название</h2>
-      <ul class="list">
-        <li class="list-item" v-for="document in documents" :key="document.name">
-          <div class="list-name">{{ document.name }}</div>
-          <button @click="deleteDocument(document)">
-            <img src="../assets/delete-icon.svg" alt="">
-          </button>
-        </li>
-      </ul>
+      <template v-if="!isLoading">
+        <h2 class="list-title">Название</h2>
+        <ul class="list">
+          <li class="list-item" v-for="document in documents" :key="document.name">
+            <a class="list-name" :href="document.url" target="_blank">{{ document.name }}</a>
+            <button @click="deleteDocument(document)">
+              <img src="../assets/delete-icon.svg" alt="">
+            </button>
+          </li>
+          <li class="list-item" v-if="documents.length === 0">Пусто</li>
+        </ul>
+      </template>
+      <p v-else>Загрузка...</p>
     </div>
   </div>
 </template>
 
 <script setup>
-  import { defineProps, defineEmits, ref } from 'vue';
+  import { defineProps, defineEmits, ref, computed } from 'vue';
   import FilesField from './FilesField.vue';
 
   const props = defineProps({
     task: Object,
+    documents: Array,
   });
 
   const emit = defineEmits([
-    'update:task',
+    'update:documents',
   ]);
 
-  const documents = ref(props.task.documents || []);
+  const documents = ref(props.documents || []);
+  const isLoading = computed(() => !documents.value);
 
-  function updateTask() {
-    emit('update:task', {
-      documents: documents.value,
-    });
+  function updateDocuments() {
+    emit('update:documents', documents.value);
   }
 
   function uploadDocuments(files) {
     for (const file of files) {
-      documents.value.push(file);
+      documents.value.push({
+        name: file.name,
+        url: URL.createObjectURL(file),
+      });
     }
-    updateTask();
+    updateDocuments();
   }
 
   function deleteDocument(document) {
@@ -81,5 +88,7 @@
   }
   .list-name {
     flex: 1;
+    text-decoration: none;
+    color: inherit;
   }
 </style>

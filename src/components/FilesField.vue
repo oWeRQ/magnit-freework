@@ -14,7 +14,7 @@
   import { defineEmits, ref } from 'vue';
 
   const emit = defineEmits([
-    'select',
+    'change',
   ]);
 
   const fileInput = ref();

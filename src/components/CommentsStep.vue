@@ -38,20 +38,19 @@
 
   const props = defineProps({
     task: Object,
+    comments: Array,
   });
 
   const emit = defineEmits([
-    'update:task',
+    'update:comments',
   ]);
 
   const chat = ref();
-  const comments = ref(props.task.comments || []);
+  const comments = ref(props.comments || []);
   const body = ref('');
 
-  function updateTask() {
-    emit('update:task', {
-      comments: comments.value,
-    });
+  function updateComments() {
+    emit('update:comments', comments.value);
   }
 
   function createComment() {
@@ -60,7 +59,7 @@
       date: new Date(),
     });
     body.value = '';
-    updateTask();
+    updateComments();
     scrollChatToBottom();
   }
 
@@ -71,7 +70,7 @@
 
   function deleteComment(comment) {
     comments.value = comments.value.filter(c => c !== comment);
-    updateTask();
+    updateComments();
   }
 
   function scrollChatToBottom() {
