@@ -10,26 +10,37 @@
     @delete:task="deleteTask($event)"
   />
   <p v-else>Загрузка...</p>
+
+  <Modal :show="confirm.show" @close="closeConfirm($event)">
+    <template #title>{{ confirm.title }}</template>
+    <div>
+      {{ confirm.body }}
+      <CountLine :value="confirm.count" />
+    </div>
+    <template #actions="{ close }">
+      <button class="btn" @click="close(false)">Отмена</button>
+      <button class="btn btn-primary" @click="close(true)">Удалить</button>
+    </template>
+  </Modal>
 </template>
 
 <script setup>
   import { ref, onMounted } from 'vue';
   import { useRouter } from 'vue-router';
   import useTasksStore from '../store/tasks';
+  import useConfirm from '../hooks/confirm';
   import TasksTable from './TasksTable.vue';
+  import Modal from './Modal.vue';
+  import CountLine from './CountLine.vue';
 
+  const { confirm, closeConfirm, deleteConfirm } = useConfirm();
   const router = useRouter();
   const tasksStore = useTasksStore();
-
   const tasks = ref();
 
   onMounted(() => {
     fetchTasks();
   });
-
-  async function deleteConfirm(count = 1) {
-    return window.confirm(`Удалить выбранное?\nВыбрано объектов ${count}`);
-  }
 
   async function fetchTasks() {
     tasks.value = await tasksStore.getTasks();
