@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
+import useStorage from '../hooks/storage';
 
 function usleep(ms) {
   return new Promise(resolve => {
@@ -9,7 +10,7 @@ function usleep(ms) {
 
 export default defineStore('tasks', () => {
   const lastId = ref(2);
-  const tasks = ref([
+  const tasks = useStorage('tasks', [
     {
       id: 1,
       name: 'Task 1',

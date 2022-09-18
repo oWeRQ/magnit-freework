@@ -1,6 +1,6 @@
 import { reactive } from 'vue';
 
-export default function() {
+export default function useConfirm() {
   let confirmResolve;
 
   const confirm = reactive({

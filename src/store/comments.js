@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
+import useStorage from '../hooks/storage';
 
 function usleep(ms) {
   return new Promise(resolve => {
@@ -9,7 +10,7 @@ function usleep(ms) {
 
 export default defineStore('comments', () => {
   const lastId = ref(2);
-  const comments = ref([
+  const comments = useStorage('comments', [
     {
       id: 1,
       taskId: 1,
