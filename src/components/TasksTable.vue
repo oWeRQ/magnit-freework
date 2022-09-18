@@ -43,7 +43,7 @@
   }
 
   function formatDate(date) {
-    return date.toLocaleDateString();
+    return new Date(date).toLocaleDateString();
   }
 
   function formatStatus(status) {

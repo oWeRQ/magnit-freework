@@ -14,13 +14,13 @@ export default defineStore('comments', () => {
       id: 1,
       taskId: 1,
       body: 'Comment 1',
-      date: new Date,
+      date: '2022-09-18T14:43:02.177Z',
     },
     {
       id: 2,
       taskId: 2,
       body: 'Comment 2',
-      date: new Date,
+      date: '2022-09-18T14:43:02.177Z',
     },
   ]);
 

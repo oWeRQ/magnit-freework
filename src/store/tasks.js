@@ -14,19 +14,15 @@ export default defineStore('tasks', () => {
       id: 1,
       name: 'Task 1',
       body: 'Task Body 1',
-      date: new Date(),
+      date: '2022-09-18T14:43:02.177Z',
       status: 'inactive',
-      documents: [],
-      comments: [],
     },
     {
       id: 2,
       name: 'Task 2',
       body: 'Task Body 2',
-      date: new Date(),
+      date: '2022-09-18T14:43:02.177Z',
       status: 'active',
-      documents: [],
-      comments: [],
     },
   ]);
 

@@ -25,7 +25,7 @@
     'close',
   ]);
 
-  function close(value = false) {
+  function close(value) {
     emit('close', value);
   }
 </script>

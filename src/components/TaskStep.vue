@@ -7,7 +7,7 @@
       </label>
       <label class="field">
         <div class="label">Дата завершения:</div>
-        <input type="date" v-model="date">
+        <input type="date" :valueAsDate="new Date(date)" @change="date = $event.target.valueAsDate.toISOString()">
       </label>
     </div>
     <div class="row">

@@ -56,7 +56,7 @@
   function createComment() {
     comments.value.push({
       body: body.value,
-      date: new Date(),
+      date: new Date().toISOString(),
     });
     body.value = '';
     updateComments();
@@ -78,11 +78,11 @@
   }
 
   function formatDate(date) {
-    return date.toLocaleDateString();
+    return new Date(date).toLocaleDateString();
   }
 
   function formatTime(date) {
-    return date.toLocaleTimeString();
+    return new Date(date).toLocaleTimeString();
   }
 </script>
 
