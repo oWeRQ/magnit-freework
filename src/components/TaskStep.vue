@@ -31,7 +31,7 @@
 </template>
 
 <script setup>
-  import { defineProps, defineEmits, ref, computed } from 'vue';
+  import { defineProps, defineEmits, ref, computed, watch, onMounted } from 'vue';
 
   const props = defineProps({
     task: Object,
@@ -41,10 +41,18 @@
     'update:task',
   ]);
 
-  const name = ref(props.task.name || '');
-  const date = ref(props.task.date || '');
-  const body = ref(props.task.body || '');
-  const status = ref(props.task.status || '');
+  const name = ref('');
+  const date = ref('');
+  const body = ref('');
+  const status = ref('');
+
+  watch(() => props.task, () => {
+    updateRefs();
+  });
+
+  onMounted(() => {
+    updateRefs();
+  });
 
   const task = computed(() => ({
     name: name.value,
@@ -52,6 +60,13 @@
     body: body.value,
     status: status.value,
   }));
+
+  function updateRefs() {
+    name.value = props.task.name || '';
+    date.value = props.task.date || '';
+    body.value = props.task.body || '';
+    status.value = props.task.status || '';
+  }
 
   function updateTask() {
     emit('update:task', task.value);
