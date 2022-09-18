@@ -4,13 +4,16 @@
     Новое задание
   </button>
   <TasksTable
-    :tasks="tasksStore.tasks"
+    v-if="tasks"
+    :tasks="tasks"
     @update:task="updateTask($event)"
     @delete:task="deleteTask($event)"
   />
+  <p v-else>Загрузка...</p>
 </template>
 
 <script setup>
+  import { ref, onMounted } from 'vue';
   import { useRouter } from 'vue-router';
   import useTasksStore from '../store/tasks';
   import TasksTable from './TasksTable.vue';
@@ -18,12 +21,18 @@
   const router = useRouter();
   const tasksStore = useTasksStore();
 
-  async function confirm(message) {
-    return window.confirm(message);
+  const tasks = ref();
+
+  onMounted(() => {
+    fetchTasks();
+  });
+
+  async function deleteConfirm(count = 1) {
+    return window.confirm(`Удалить выбранное?\nВыбрано объектов ${count}`);
   }
 
-  function deleteConfirm(count = 1) {
-    return confirm(`Удалить выбранное?\nВыбрано объектов ${count}`);
+  async function fetchTasks() {
+    tasks.value = await tasksStore.getTasks();
   }
 
   async function deleteTask(task) {

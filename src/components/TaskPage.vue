@@ -29,12 +29,13 @@
         Отмена
       </button>
     </div>
-    <component :is="activeStep.component" :task="task" @update:task="updateTask($event)" />
+    <component v-if="isLoaded" :is="activeStep.component" :task="task" @update:task="updateTask($event)" />
+    <p v-else>Загрузка...</p>
   </div>
 </template>
 
 <script setup>
-  import { ref, computed } from 'vue';
+  import { ref, computed, watch, onMounted } from 'vue';
   import { useRouter, useRoute } from 'vue-router';
   import useTasksStore from '../store/tasks';
   import TaskStep from './TaskStep.vue';
@@ -51,13 +52,14 @@
     name: '',
     date: '',
     body: '',
-    status: '',
+    status: 'inactive',
     documents: [],
     comments: [],
   };
+  const task = ref();
   const id = computed(() => route.params.id);
   const isNew = computed(() => !id.value);
-  const task = ref(structuredClone(tasksStore.tasks.find(t => t.id == id.value) || defaultTask));
+  const isLoaded = computed(() => !!task.value);
 
   const steps = [
     {
@@ -75,8 +77,20 @@
   ];
   const stepIndex = ref(0);
   const activeStep = computed(() => steps[stepIndex.value]);
-  const hasPrevStep = computed(() => stepIndex.value > 0)
-  const hasNextStep = computed(() => stepIndex.value < steps.length - 1)
+  const hasPrevStep = computed(() => stepIndex.value > 0);
+  const hasNextStep = computed(() => stepIndex.value < steps.length - 1);
+
+  watch(id, () => {
+    fetchTask();
+  });
+
+  onMounted(() => {
+    fetchTask();
+  });
+
+  async function fetchTask() {
+    task.value = structuredClone(id.value && await tasksStore.getTaskById(id.value) || defaultTask);
+  }
 
   function prevStep() {
     if (hasPrevStep.value) {

@@ -1,6 +1,12 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
+function usleep(ms) {
+  return new Promise(resolve => {
+    setTimeout(resolve, ms);
+  });
+}
+
 export default defineStore('tasks', () => {
   const lastId = ref(2);
   const tasks = ref([
@@ -24,9 +30,19 @@ export default defineStore('tasks', () => {
     },
   ]);
 
+  async function getTasks() {
+    await usleep(500);
+    return tasks.value;
+  }
+
+  async function getTaskById(id) {
+    await usleep(500);
+    return tasks.value.find(t => t.id == id);
+  }
+
   async function saveTask(task) {
     if (task.id) {
-      tasks.value = tasks.value.map(t => t.id === task.id ? task : t);
+      tasks.value = tasks.value.map(t => t.id == task.id ? task : t);
     } else {
       tasks.value = [
         ...tasks.value,
@@ -43,7 +59,8 @@ export default defineStore('tasks', () => {
   }
 
   return {
-    tasks,
+    getTasks,
+    getTaskById,
     saveTask,
     deleteTask,
   };
