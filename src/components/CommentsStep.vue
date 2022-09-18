@@ -96,7 +96,7 @@
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    justify-content: end;
+    justify-content: flex-end;
     align-items: flex-start;
     margin-right: 31px;
     padding: 30px;
@@ -147,7 +147,7 @@
   }
   .actions {
     display: flex;
-    justify-content: end;
+    justify-content: flex-end;
     margin: 20px 0 10px;
   }
 </style>
