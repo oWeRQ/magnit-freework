@@ -8,6 +8,7 @@
         v-for="(step, i) in steps"
         :key="i"
         :class="{ passed: i < stepIndex, active: i === stepIndex }"
+        @click="changeStep(i)"
       >{{ step.title }}</li>
     </ol>
     <div class="actions">
@@ -96,16 +97,31 @@
     return confirm('Отменить?');
   }
 
-  function prevStep() {
-    if (hasPrevStep.value) {
-      stepIndex.value--;
+  function canChangeStep(i) {
+    if (i < 0 || i >= steps.length)
+      return false;
+
+    if (!isNew.value)
+      return true;
+
+    if (task.value.name && task.value.date)
+      return true;
+
+    return false;
+  }
+
+  function changeStep(i) {
+    if (canChangeStep(i)) {
+      stepIndex.value = i;
     }
   }
 
+  function prevStep() {
+    changeStep(stepIndex.value - 1);
+  }
+
   function nextStep() {
-    if (hasNextStep.value) {
-      stepIndex.value++;
-    }
+    changeStep(stepIndex.value + 1);
   }
 
   async function saveTask() {
@@ -150,6 +166,7 @@
     font-weight: 500;
     background: #F2F6F9;
     border-top-left-radius: 10px;
+    cursor: pointer;
   }
   .steps > .passed {
     color: #FFFFFF;
