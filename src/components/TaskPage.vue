@@ -24,7 +24,7 @@
         <img src="../assets/done-icon.svg" alt="" />
         Сохранить
       </button>
-      <button class="btn" @click="backToList()">
+      <button class="btn" @click="cancelTask()">
         <img src="../assets/cancel-icon.svg" alt="" />
         Отмена
       </button>
@@ -92,6 +92,10 @@
     task.value = structuredClone(id.value && await tasksStore.getTaskById(id.value) || defaultTask);
   }
 
+  async function cancelConfirm() {
+    return confirm('Отменить?');
+  }
+
   function prevStep() {
     if (hasPrevStep.value) {
       stepIndex.value--;
@@ -104,9 +108,15 @@
     }
   }
 
-  function saveTask() {
-    tasksStore.saveTask(task.value);
+  async function saveTask() {
+    await tasksStore.saveTask(task.value);
     backToList();
+  }
+
+  async function cancelTask() {
+    if (await cancelConfirm()) {
+      backToList();
+    }
   }
 
   function backToList() {
