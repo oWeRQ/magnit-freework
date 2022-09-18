@@ -39,6 +39,7 @@ export default defineStore('tasks', () => {
   async function saveTask(task) {
     if (task.id) {
       tasks.value = tasks.value.map(t => t.id == task.id ? task : t);
+      return task.id;
     } else {
       tasks.value = [
         ...tasks.value,
@@ -47,6 +48,7 @@ export default defineStore('tasks', () => {
           id: ++lastId.value,
         },
       ];
+      return lastId.value;
     }
   }
 

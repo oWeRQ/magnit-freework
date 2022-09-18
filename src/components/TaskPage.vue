@@ -152,10 +152,9 @@
   }
 
   async function saveTask() {
-    const taskId = task.value.id;
+    const taskId = await tasksStore.saveTask(task.value);
 
     await Promise.all([
-      tasksStore.saveTask(task.value),
       ...documents.value.filter(d => !d.id).map(document => {
         return documentsStore.saveDocument({ ...document, taskId });
       }),
