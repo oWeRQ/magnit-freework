@@ -37,8 +37,8 @@
 
   async function deleteTask(task) {
     if (await deleteConfirm()) {
-      console.log('delete', task);
-      tasksStore.deleteTask(task);
+      await tasksStore.deleteTask(task);
+      await fetchTasks();
     }
   }
 
