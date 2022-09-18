@@ -73,7 +73,7 @@
     border-bottom: 1px solid #DFE3E7;
   }
   .field {
-    flex-grow: 1;
+    flex: 1 0 0;
   }
   .grow-2 {
     flex-grow: 2;

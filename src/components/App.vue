@@ -56,6 +56,7 @@ export default {
     padding: 0;
     background: transparent;
     border: none;
+    cursor: pointer;
   }
 
   .btn {
