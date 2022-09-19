@@ -1,26 +1,29 @@
 export default new Promise((resolve, reject) => {
-  const openRequest = indexedDB.open('store', 1);
+  const openRequest = indexedDB.open('store', 2);
 
   openRequest.onupgradeneeded = (event) => {
     console.log('onupgradeneeded', event.oldVersion);
     const db = openRequest.result;
-    if (!db.objectStoreNames.contains('tasks')) {
-      db.createObjectStore('tasks', {
-        keyPath: 'id',
-        autoIncrement: true,
-      });
-    }
-    if (!db.objectStoreNames.contains('documents')) {
-      db.createObjectStore('documents', {
-        keyPath: 'id',
-        autoIncrement: true,
-      });
-    }
-    if (!db.objectStoreNames.contains('comments')) {
-      db.createObjectStore('comments', {
-        keyPath: 'id',
-        autoIncrement: true,
-      });
+    const tx = openRequest.transaction;
+
+    switch (event.oldVersion) {
+      case 0:
+        db.createObjectStore('tasks', {
+          keyPath: 'id',
+          autoIncrement: true,
+        });
+        db.createObjectStore('documents', {
+          keyPath: 'id',
+          autoIncrement: true,
+        });
+        db.createObjectStore('comments', {
+          keyPath: 'id',
+          autoIncrement: true,
+        });
+      // eslint-disable-next-line no-fallthrough
+      case 1:
+        tx.objectStore('documents').createIndex('taskId', 'taskId');
+        tx.objectStore('comments').createIndex('taskId', 'taskId');
     }
   };
 
@@ -67,6 +70,10 @@ export default new Promise((resolve, reject) => {
       return request(storeName, store => store.getAll(), false);
     }
 
+    function getAllFromIndex(storeName, indexName, key) {
+      return request(storeName, store => store.index(indexName).getAll(key), false);
+    }
+
     resolve({
       db,
       request,
@@ -75,6 +82,7 @@ export default new Promise((resolve, reject) => {
       deleteKey,
       get,
       getAll,
+      getAllFromIndex,
     });
   };
 });

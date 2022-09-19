@@ -6,8 +6,8 @@ const STORAGE_NAME = 'documents';
 
 export default defineStore('documents', () => {
   async function getDocumentsByTaskId(taskId) {
-    const { getAll } = await indexedDB;
-    return (await getAll(STORAGE_NAME)).filter(item => item.taskId == taskId);
+    const { getAllFromIndex } = await indexedDB;
+    return await getAllFromIndex(STORAGE_NAME, 'taskId', +taskId);
   }
 
   async function saveDocument(data) {

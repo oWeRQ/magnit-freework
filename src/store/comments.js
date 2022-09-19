@@ -6,8 +6,8 @@ const STORAGE_NAME = 'comments';
 
 export default defineStore('comments', () => {
   async function getCommentsByTaskId(taskId) {
-    const { getAll } = await indexedDB;
-    return (await getAll(STORAGE_NAME)).filter(item => item.taskId == taskId);
+    const { getAllFromIndex } = await indexedDB;
+    return await getAllFromIndex(STORAGE_NAME, 'taskId', +taskId);
   }
 
   async function saveComment(data) {
