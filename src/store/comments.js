@@ -1,47 +1,27 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
-import useStorage from '../hooks/storage';
+import { toRaw } from 'vue';
+import indexedDB from './indexedDB';
 
-function usleep(ms) {
-  return new Promise(resolve => {
-    setTimeout(resolve, ms);
-  });
-}
+const STORAGE_NAME = 'comments';
 
 export default defineStore('comments', () => {
-  const comments = useStorage('comments', [
-    {
-      id: 1,
-      taskId: 1,
-      body: 'Comment 1',
-      date: '2022-09-18T14:43:02.177Z',
-    },
-    {
-      id: 2,
-      taskId: 2,
-      body: 'Comment 2',
-      date: '2022-09-18T14:43:02.177Z',
-    },
-  ]);
-  const lastId = ref(comments.value.reduce((a, c) => Math.max(a, c.id), 0));
-
   async function getCommentsByTaskId(taskId) {
-    await usleep(500);
-    return comments.value.filter(t => t.taskId == taskId);
+    const { getAll } = await indexedDB;
+    return (await getAll(STORAGE_NAME)).filter(item => item.taskId == taskId);
   }
 
-  async function saveComment(comment) {
-    comments.value = [
-      ...comments.value,
-      {
-        ...comment,
-        id: ++lastId.value,
-      },
-    ];
+  async function saveComment(data) {
+    const { add, put } = await indexedDB;
+    if (data.id) {
+      return await put(STORAGE_NAME, toRaw(data));
+    } else {
+      return await add(STORAGE_NAME, toRaw(data));
+    }
   }
 
-  async function deleteComment(comment) {
-    comments.value = comments.value.filter(t => t.id !== comment.id);
+  async function deleteComment(data) {
+    const { deleteKey } = await indexedDB;
+    await deleteKey(STORAGE_NAME, data.id);
   }
 
   return {

@@ -1,47 +1,27 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
-import useStorage from '../hooks/storage';
+import { toRaw } from 'vue';
+import indexedDB from './indexedDB';
 
-function usleep(ms) {
-  return new Promise(resolve => {
-    setTimeout(resolve, ms);
-  });
-}
+const STORAGE_NAME = 'documents';
 
 export default defineStore('documents', () => {
-  const documents = useStorage('documents', [
-    {
-      id: 1,
-      taskId: 1,
-      name: 'Document 1',
-      url: 'data:text/plain,document 1',
-    },
-    {
-      id: 2,
-      taskId: 2,
-      name: 'Document 2',
-      url: 'data:text/plain,document 2',
-    },
-  ]);
-  const lastId = ref(documents.value.reduce((a, c) => Math.max(a, c.id), 0));
-
   async function getDocumentsByTaskId(taskId) {
-    await usleep(500);
-    return documents.value.filter(t => t.taskId == taskId);
+    const { getAll } = await indexedDB;
+    return (await getAll(STORAGE_NAME)).filter(item => item.taskId == taskId);
   }
 
-  async function saveDocument(document) {
-    documents.value = [
-      ...documents.value,
-      {
-        ...document,
-        id: ++lastId.value,
-      },
-    ];
+  async function saveDocument(data) {
+    const { add, put } = await indexedDB;
+    if (data.id) {
+      return await put(STORAGE_NAME, toRaw(data));
+    } else {
+      return await add(STORAGE_NAME, toRaw(data));
+    }
   }
 
-  async function deleteDocument(document) {
-    documents.value = documents.value.filter(t => t.id !== document.id);
+  async function deleteDocument(data) {
+    const { deleteKey } = await indexedDB;
+    await deleteKey(STORAGE_NAME, data.id);
   }
 
   return {
