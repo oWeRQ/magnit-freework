@@ -9,7 +9,6 @@ function usleep(ms) {
 }
 
 export default defineStore('tasks', () => {
-  const lastId = ref(2);
   const tasks = useStorage('tasks', [
     {
       id: 1,
@@ -26,6 +25,7 @@ export default defineStore('tasks', () => {
       status: 'active',
     },
   ]);
+  const lastId = ref(tasks.value.reduce((a, c) => Math.max(a, c.id), 0));
 
   async function getTasks() {
     await usleep(500);

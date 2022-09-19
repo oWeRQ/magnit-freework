@@ -9,7 +9,6 @@ function usleep(ms) {
 }
 
 export default defineStore('comments', () => {
-  const lastId = ref(2);
   const comments = useStorage('comments', [
     {
       id: 1,
@@ -24,6 +23,7 @@ export default defineStore('comments', () => {
       date: '2022-09-18T14:43:02.177Z',
     },
   ]);
+  const lastId = ref(comments.value.reduce((a, c) => Math.max(a, c.id), 0));
 
   async function getCommentsByTaskId(taskId) {
     await usleep(500);

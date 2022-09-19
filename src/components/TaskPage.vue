@@ -67,8 +67,8 @@
   import DocumentsStep from './DocumentsStep.vue';
   import CommentsStep from './CommentsStep.vue';
   import useConfirm from '../hooks/confirm';
+  import diff from '../functions/diff';
 
-  const structuredClone = window.structuredClone;
   const router = useRouter();
   const route = useRoute();
   const tasksStore = useTasksStore();
@@ -82,12 +82,12 @@
     date: '',
     body: '',
     status: 'inactive',
-    documents: [],
-    comments: [],
   };
   const task = ref();
   const documents = ref();
+  const documentsSaved = ref();
   const comments = ref();
+  const commentsSaved = ref();
   const id = computed(() => route.params.id);
   const isNew = computed(() => !id.value);
   const isLoaded = computed(() => !task.value);
@@ -124,15 +124,15 @@
   });
 
   async function fetchTask() {
-    task.value = structuredClone(id.value && await tasksStore.getTaskById(id.value) || defaultTask);
+    task.value = id.value && await tasksStore.getTaskById(id.value) || defaultTask;
   }
 
   async function fetchDocuments() {
-    documents.value = structuredClone(id.value && await documentsStore.getDocumentsByTaskId(id.value) || []);
+    documents.value = documentsSaved.value = id.value ? await documentsStore.getDocumentsByTaskId(id.value) : [];
   }
 
   async function fetchComments() {
-    comments.value = structuredClone(id.value && await commentsStore.getCommentsByTaskId(id.value) || []);
+    comments.value = commentsSaved.value = id.value ? await commentsStore.getCommentsByTaskId(id.value) : [];
   }
 
   function canChangeStep(i) {
@@ -165,13 +165,14 @@
   async function saveTask() {
     const taskId = await tasksStore.saveTask(task.value);
 
+    const [documentsAdded, documentsRemoved] = diff(documents.value, documentsSaved.value, JSON.stringify);
+    const [commentsAdded, commentsRemoved] = diff(comments.value, commentsSaved.value, JSON.stringify);
+
     await Promise.all([
-      ...documents.value.filter(d => !d.id).map(document => {
-        return documentsStore.saveDocument({ ...document, taskId });
-      }),
-      ...comments.value.filter(c => !c.id).map(comment => {
-        return commentsStore.saveComment({ ...comment, taskId });
-      }),
+      ...documentsAdded.map(document =>  documentsStore.saveDocument({ ...document, taskId })),
+      ...documentsRemoved.map(document => documentsStore.deleteDocument(document)),
+      ...commentsAdded.map(comment => commentsStore.saveComment({ ...comment, taskId })),
+      ...commentsRemoved.map(comment => commentsStore.deleteComment(comment)),
     ]);
 
     backToList();
@@ -196,18 +197,12 @@
     };
   }
 
-  function updateDocuments(documents) {
-    task.value = {
-      ...task.value,
-      documents,
-    };
+  function updateDocuments(value) {
+    documents.value = value;
   }
 
-  function updateComments(comments) {
-    task.value = {
-      ...task.value,
-      comments,
-    };
+  function updateComments(value) {
+    comments.value = value;
   }
 </script>
 

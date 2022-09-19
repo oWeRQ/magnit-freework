@@ -42,17 +42,20 @@
   }
 
   function uploadDocuments(files) {
+    const documentsAdded = [];
     for (const file of files) {
-      documents.value.push({
+      documentsAdded.push({
         name: file.name,
         url: URL.createObjectURL(file),
       });
     }
+    documents.value = [...documents.value, ...documentsAdded];
     updateDocuments();
   }
 
   function deleteDocument(document) {
     documents.value = documents.value.filter(d => d !== document);
+    updateDocuments();
   }
 </script>
 

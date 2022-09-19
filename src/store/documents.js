@@ -9,7 +9,6 @@ function usleep(ms) {
 }
 
 export default defineStore('documents', () => {
-  const lastId = ref(2);
   const documents = useStorage('documents', [
     {
       id: 1,
@@ -24,6 +23,7 @@ export default defineStore('documents', () => {
       url: 'data:text/plain,document 2',
     },
   ]);
+  const lastId = ref(documents.value.reduce((a, c) => Math.max(a, c.id), 0));
 
   async function getDocumentsByTaskId(taskId) {
     await usleep(500);
