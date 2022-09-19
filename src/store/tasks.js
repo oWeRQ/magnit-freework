@@ -1,60 +1,30 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
-import useStorage from '../hooks/storage';
-
-function usleep(ms) {
-  return new Promise(resolve => {
-    setTimeout(resolve, ms);
-  });
-}
+import { toRaw } from 'vue';
+import indexedDB from './indexedDB';
 
 export default defineStore('tasks', () => {
-  const tasks = useStorage('tasks', [
-    {
-      id: 1,
-      name: 'Task 1',
-      body: 'Task Body 1',
-      date: '2022-09-18T14:43:02.177Z',
-      status: 'inactive',
-    },
-    {
-      id: 2,
-      name: 'Task 2',
-      body: 'Task Body 2',
-      date: '2022-09-18T14:43:02.177Z',
-      status: 'active',
-    },
-  ]);
-  const lastId = ref(tasks.value.reduce((a, c) => Math.max(a, c.id), 0));
-
   async function getTasks() {
-    await usleep(500);
-    return tasks.value;
+    const { getAll } = await indexedDB;
+    return await getAll('tasks');
   }
 
   async function getTaskById(id) {
-    await usleep(500);
-    return tasks.value.find(t => t.id == id);
+    const { get } = await indexedDB;
+    return await get('tasks', +id);
   }
 
   async function saveTask(task) {
+    const { add, put } = await indexedDB;
     if (task.id) {
-      tasks.value = tasks.value.map(t => t.id == task.id ? task : t);
-      return task.id;
+      return await put('tasks', toRaw(task));
     } else {
-      tasks.value = [
-        ...tasks.value,
-        {
-          ...task,
-          id: ++lastId.value,
-        },
-      ];
-      return lastId.value;
+      return await add('tasks', toRaw(task));
     }
   }
 
   async function deleteTask(task) {
-    tasks.value = tasks.value.filter(t => t.id !== task.id);
+    const { deleteKey } = await indexedDB;
+    await deleteKey('tasks', task.id);
   }
 
   return {

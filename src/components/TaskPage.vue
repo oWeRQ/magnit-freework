@@ -77,7 +77,6 @@
   const { confirm, closeConfirm, showConfirm } = useConfirm();
 
   const defaultTask = {
-    id: null,
     name: '',
     date: '',
     body: '',
