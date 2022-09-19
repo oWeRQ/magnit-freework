@@ -54,11 +54,11 @@
   }
 
   function createComment() {
-    body.value = '';
     comments.value = [...comments.value, {
       body: body.value,
       date: new Date().toISOString(),
     }];
+    body.value = '';
     updateComments();
     scrollChatToBottom();
   }
