@@ -1,4 +1,16 @@
-export default new Promise((resolve, reject) => {
+function requestToPromise(request) {
+  return new Promise((resolve, reject) => {
+    request.onerror = () => {
+      reject(request.error);
+    };
+
+    request.onsuccess = () => {
+      resolve(request.result);
+    };
+  });
+}
+
+function openDB() {
   const openRequest = indexedDB.open('store', 2);
 
   openRequest.onupgradeneeded = (event) => {
@@ -27,62 +39,51 @@ export default new Promise((resolve, reject) => {
     }
   };
 
-  openRequest.onerror = () => {
-    reject(openRequest.error);
+  return requestToPromise(openRequest);
+}
+
+const dbPromise = openDB();
+
+export default function store(storeName) {
+  async function request(cb, write = true) {
+    const db = await dbPromise;
+    const transaction = db.transaction(storeName, write ? 'readwrite' : 'readonly');
+    const store = transaction.objectStore(storeName);
+    const request = cb(store);
+    return requestToPromise(request);
+  }
+
+  function add(data) {
+    return request(store => store.add(data));
+  }
+
+  function put(data) {
+    return request(store => store.put(data));
+  }
+
+  function del(key) {
+    return request(store => store.delete(key));
+  }
+
+  function get(key) {
+    return request(store => store.get(key), false);
+  }
+
+  function getAll() {
+    return request(store => store.getAll(), false);
+  }
+
+  function getAllFromIndex(indexName, key) {
+    return request(store => store.index(indexName).getAll(key), false);
+  }
+
+  return {
+    request,
+    add,
+    put,
+    del,
+    get,
+    getAll,
+    getAllFromIndex,
   };
-
-  openRequest.onsuccess = () => {
-    const db = openRequest.result;
-
-    function request(storeName, cb, write = true) {
-      return new Promise((resolve, reject) => {
-        const transaction = db.transaction(storeName, write ? 'readwrite' : 'readonly');
-        const store = transaction.objectStore(storeName);
-        const request = cb(store);
-
-        request.onsuccess = () => {
-          resolve(request.result);
-        };
-
-        request.onerror = () => {
-          reject(request.error);
-        };
-      });
-    }
-
-    function add(storeName, data) {
-      return request(storeName, store => store.add(data));
-    }
-
-    function put(storeName, data) {
-      return request(storeName, store => store.put(data));
-    }
-
-    function deleteKey(storeName, key) {
-      return request(storeName, store => store.delete(key));
-    }
-
-    function get(storeName, key) {
-      return request(storeName, store => store.get(key), false);
-    }
-
-    function getAll(storeName) {
-      return request(storeName, store => store.getAll(), false);
-    }
-
-    function getAllFromIndex(storeName, indexName, key) {
-      return request(storeName, store => store.index(indexName).getAll(key), false);
-    }
-
-    resolve({
-      db,
-      request,
-      add,
-      put,
-      deleteKey,
-      get,
-      getAll,
-      getAllFromIndex,
-    });
-  };
-});
+}
