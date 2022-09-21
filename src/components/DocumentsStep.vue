@@ -23,6 +23,7 @@
 
 <script setup>
   import { defineProps, defineEmits, ref, computed } from 'vue';
+  import readAsDataURL from '../functions/readAsDataURL';
   import FilesField from './FilesField.vue';
 
   const props = defineProps({
@@ -41,12 +42,12 @@
     emit('update:documents', documents.value);
   }
 
-  function uploadDocuments(files) {
+  async function uploadDocuments(files) {
     const documentsAdded = [];
     for (const file of files) {
       documentsAdded.push({
         name: file.name,
-        url: URL.createObjectURL(file),
+        url: await readAsDataURL(file),
       });
     }
     documents.value = [...documents.value, ...documentsAdded];

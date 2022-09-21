@@ -18,6 +18,7 @@ function openDB() {
     const db = openRequest.result;
     const tx = openRequest.transaction;
 
+    /* eslint-disable no-fallthrough */
     switch (event.oldVersion) {
       case 0:
         db.createObjectStore('tasks', {
@@ -32,11 +33,11 @@ function openDB() {
           keyPath: 'id',
           autoIncrement: true,
         });
-      // eslint-disable-next-line no-fallthrough
       case 1:
         tx.objectStore('documents').createIndex('taskId', 'taskId');
         tx.objectStore('comments').createIndex('taskId', 'taskId');
     }
+    /* eslint-enable no-fallthrough */
   };
 
   return requestToPromise(openRequest);
@@ -53,12 +54,12 @@ export default function store(storeName) {
     return requestToPromise(request);
   }
 
-  function add(data) {
-    return request(store => store.add(data));
+  function add(data, key) {
+    return request(store => store.add(data, key));
   }
 
-  function put(data) {
-    return request(store => store.put(data));
+  function put(data, key) {
+    return request(store => store.put(data, key));
   }
 
   function del(key) {
